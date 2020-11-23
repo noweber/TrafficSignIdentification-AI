@@ -91,33 +91,28 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    model = tf.keras.models.Sequential([
-        # First Convolutional Layer:
-        tf.keras.layers.Conv2D(
-            NUM_CATEGORIES, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
-        ),
+    # Create a neural network
+    model = tf.keras.models.Sequential()
 
-        # First Max-pooling Layer:
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+    # Add convolutional and max-pooling layers:
+    for i in range(4):
+        if i == 0:
+            # Source: https://www.tensorflow.org/api_docs/python/tf/keras/layers/InputLayer
+            model.add(tf.keras.layers.InputLayer((IMG_WIDTH, IMG_HEIGHT, 3)))
+        else:
+            # Convolutional and Max-pooling Layers:
+            model.add(tf.keras.layers.Conv2D(IMG_WIDTH * i, 3, activation="relu"))
+            model.add(tf.keras.layers.MaxPooling2D())
 
-        # Second Convolutional Layer:
-        tf.keras.layers.Conv2D(
-            NUM_CATEGORIES * 2, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
-        ),
+    # Flatten Layer:
+    model.add(tf.keras.layers.Flatten())
+    
+    # Hidden Layer and Dropout to Prevent Overfitting
+    model.add(tf.keras.layers.Dense(NUM_CATEGORIES * 2, activation="relu"))
+    model.add(tf.keras.layers.Dropout(0.4))
 
-        # Second Max-pooling Layer:
-        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
-
-        # Flatten units
-        tf.keras.layers.Flatten(),
-
-        # Hidden Layer and Dropout to Prevent Overfitting
-        tf.keras.layers.Dense(NUM_CATEGORIES * 4, activation="relu"),
-        tf.keras.layers.Dropout(0.4),
-
-        # Softmax Activated Output Layer
-        tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
-    ])
+    # Softmax Activated Output Layer
+    model.add(tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax"))
 
     # Train neural network
     model.compile(
@@ -125,7 +120,7 @@ def get_model():
         loss="categorical_crossentropy",
         metrics=["accuracy"]
     )
-    print(model.summary())
+    
     return model
 
 if __name__ == "__main__":
