@@ -74,18 +74,14 @@ def load_data(data_dir):
             # print("files: ", files)
             for filename in files:
                 image = cv2.imread(os.path.join(category_path, filename))
-                resized_image_data = cv2.resize(image, (IMG_WIDTH, IMG_HEIGHT), interpolation = cv2.INTER_AREA)
+                resized_image_data = cv2.resize(image, (IMG_WIDTH, IMG_HEIGHT))
                 # print("image: ", image)
                 images.append(resized_image_data)
-                labels.append(category)
+                labels.append(int(category))
 
     # print("images: ", images)
     # print("labels: ", labels)
     return images, labels
-    # TODO: use ospath to 
-    # TODO: os.listdir(data_dir) to get directories within a path.. 0 to 43
-    # TODO: os.walk can generate filenames in the directory?
-    # TODO: Resize each image to the same width and height
 
 
 def get_model():
@@ -94,7 +90,69 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    print("get_model()")
+    model = tf.keras.models.Sequential([
+
+        # Convolutional layer. Learn 32 filters using a 3x3 kernel
+        tf.keras.layers.Conv2D(
+            32, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
+        ),
+
+        # Max-pooling layer, using 2x2 pool size
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
+        # Flatten units
+        tf.keras.layers.Flatten(),
+
+        # Add a hidden layer with dropout
+        tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dropout(0.5),
+
+        # Add an output layer with output units for all 10 digits
+        tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
+    ])
+
+    # Train neural network
+    model.compile(
+        optimizer="adam",
+        loss="categorical_crossentropy",
+        metrics=["accuracy"]
+    )
+    print(model.summary())
+    return model
+
+    #  model = tf.keras.models.Sequential([
+    #     # tf.keras.layers.Input(shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
+    #     # tf.keras.layers.Conv2D(filters=NUM_CATEGORIES, kernel_size=3, strides=(2, 2), activation='relu'),
+    #     # tf.keras.layers.Flatten(),
+    #     # Convolutional layer:
+    #     # tf.keras.layers.Conv2D(NUM_CATEGORIES, (3, 3), input_shape=(IMG_WIDTH, IMG_HEIGHT, 3), activation='relu', padding='same'),
+    #     tf.keras.layers.Conv2D(32, (3, 3), input_shape=(IMG_WIDTH, IMG_HEIGHT, 3), activation='relu'),
+
+    #     # tf.keras.layers.Conv2DTranspose(NUM_CATEGORIES, 3, strides=2, padding='same'),
+    #     # # Max-pooling layer, using 2x2 pool size
+    #     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+        
+    #     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+
+    #     # tf.keras.layers.Conv2DTranspose(NUM_CATEGORIES, 3, strides=2, padding='same'),
+    #     # # Max-pooling layer, using 2x2 pool size
+    #     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+    #     # # Flatten units
+    #     tf.keras.layers.Flatten(),
+
+    #     # # # Add a hidden layer with dropout
+
+    #     # tf.keras.layers.Flatten(),
+    #     tf.keras.layers.Dense(128, activation="relu"),
+    #     tf.keras.layers.Dropout(0.5),
+
+    #     # Add an output layer with output units for all possible categories:
+    #     # tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
+    #     # tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
+    #     tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
+    # ])
+
+
     # TODO: could have training, calibration, and validation with a 3-part training test split
     # TODO: training time should be a few minutes
     # TODO: the nextwork should be 30 x 30 x 3 neurons
@@ -102,8 +160,64 @@ def get_model():
     # TODO: should use relu activation for hidden layer
     # TODO: possibly use sigmoid for final layer?
     # TODO: https://www.tensorflow.org/tutorials/images/classification
-    raise NotImplementedError
 
+    # Create a convolutional neural network
+    # model = tf.keras.Sequential()
+    # model.add()
+    # model.add()
+    # model.add(tf.keras.layers.Flatten())
+    # model.add(tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax"))
+    # model = tf.keras.models.Sequential([
+    #     # tf.keras.layers.Input(shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
+    #     # tf.keras.layers.Conv2D(filters=NUM_CATEGORIES, kernel_size=3, strides=(2, 2), activation='relu'),
+    #     # tf.keras.layers.Flatten(),
+    #     # Convolutional layer:
+    #     # tf.keras.layers.Conv2D(NUM_CATEGORIES, (3, 3), input_shape=(IMG_WIDTH, IMG_HEIGHT, 3), activation='relu', padding='same'),
+    #     tf.keras.layers.Conv2D(32, (3, 3), input_shape=(IMG_WIDTH, IMG_HEIGHT, 3), activation='relu'),
+
+    #     # tf.keras.layers.Conv2DTranspose(NUM_CATEGORIES, 3, strides=2, padding='same'),
+    #     # # Max-pooling layer, using 2x2 pool size
+    #     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+        
+    #     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+
+    #     # tf.keras.layers.Conv2DTranspose(NUM_CATEGORIES, 3, strides=2, padding='same'),
+    #     # # Max-pooling layer, using 2x2 pool size
+    #     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+    #     # # Flatten units
+    #     tf.keras.layers.Flatten(),
+
+    #     # # # Add a hidden layer with dropout
+
+    #     # tf.keras.layers.Flatten(),
+    #     tf.keras.layers.Dense(128, activation="relu"),
+    #     tf.keras.layers.Dropout(0.5),
+
+    #     # Add an output layer with output units for all possible categories:
+    #     # tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
+    #     # tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
+    #     tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
+    # ])
+    # model = tf.keras.models.Sequential([
+
+    #     # Convolutional layer. Learn 32 filters using a 3x3 kernel
+    #     tf.keras.layers.Conv2D(
+    #         IMG_WIDTH, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
+    #     ),
+
+    #     # Max-pooling layer, using 2x2 pool size
+    #     tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
+
+    #     # Flatten units
+    #     tf.keras.layers.Flatten(),
+
+    #     # Add a hidden layer with dropout
+    #     tf.keras.layers.Dense(128, activation="relu"),
+    #     tf.keras.layers.Dropout(0.5),
+
+    #     # Add an output layer with output units for all 10 digits
+    #     tf.keras.layers.Dense(3, activation="softmax")
+    # ])
 
 if __name__ == "__main__":
     main()
