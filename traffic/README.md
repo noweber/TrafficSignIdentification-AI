@@ -8,7 +8,7 @@ Notable Attempts:
 - Removal of flattening layers broke the network due to incompatible shapes.
 - Trying to make the convolution kernals and pooling sizes proportionate to each other and to the input image width/height only slowed things down and reduced accuracy.
 - Too many rounds on convolution and pooling slowed training times down
-- I created a for loop to add many layers. I alternated between convolution, max-pooling, hidden layers, and dropouts. This drastically increased training time, but the accuracy improvements were neglible.
+- I created a for loop to add many layers. I alternated between additional convolution, max-pooling, hidden layers, and dropouts. This drastically increased training time, but the accuracy improvements were neglible.
 
 Also Tried:
 - Different configurations of Python and TensorFlow. Installing/Re-Installing/Verifying PATH variables were correct. I ran into some Python/TensorFlow/Windows compatibility issues.
